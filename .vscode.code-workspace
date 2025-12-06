@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": ".vscode",
+			"path": "../../DanCart/Front/.vscode"
+		},
+		{
+			"name": "FrontV2",
+			"path": "."
+		}
+	],
+	"settings": {}
+}
