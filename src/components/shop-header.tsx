@@ -3,8 +3,19 @@
 import Link from "next/link"
 import { User, ShoppingCart } from "lucide-react"
 import { Button } from "./ui/button"
+import { useCart } from "../hooks/cart/useCart"
+import { AuthenticationService } from "../lib/services/AuthenticationService"
+import { useEffect, useState } from "react"
 
 export default function ShopHeader() {
+  const { itemCount } = useCart()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+  useEffect(() => {
+    const authService = new AuthenticationService()
+    setIsAuthenticated(authService.isAuthenticated())
+  }, [])
+
   return (
     <header className="border-b border-border bg-background sticky top-0 z-50">
       <div className="flex items-center justify-between px-6 py-2 max-w-7xl mx-auto">
@@ -14,8 +25,13 @@ export default function ShopHeader() {
 
         <div className="flex items-center gap-2">
           <Link href="/cart">
-            <Button variant="ghost" size="icon" className="rounded-full" aria-label="Shopping cart">
+            <Button variant="ghost" size="icon" className="rounded-full relative" aria-label="Shopping cart">
               <ShoppingCart className="h-5 w-5" />
+              {isAuthenticated && itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] h-[18px] flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
             </Button>
           </Link>
           <Link href="/profile">

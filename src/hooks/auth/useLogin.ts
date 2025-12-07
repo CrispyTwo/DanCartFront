@@ -50,8 +50,7 @@ export function useLogin(options?: UseLoginOptions) {
       } finally {
         if (mounted.current) setIsLoading(false)
       }
-    },
-    [options, router]
+    }, [options, router]
   )
 
   return { handleLogin, isLoading, error, setError }

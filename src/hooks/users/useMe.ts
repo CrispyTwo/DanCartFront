@@ -5,7 +5,7 @@ import { User } from "@/src/lib/models/User";
 
 export function useMe() {
   const [me, setMe] = useState<User>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = async () => {
@@ -19,7 +19,7 @@ export function useMe() {
 
       const user = await apiService.get(`/auth/me`, 1, token) as User;
       console.log(user);
-      
+
       setMe(user);
     } catch (err: any) {
       setError(err?.message ?? String(err));

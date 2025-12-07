@@ -5,20 +5,20 @@ import { ApiService } from "../../lib/api/ApiService";
 import { ApiOptions, ApiQueryBuilder } from "@/src/lib/api/ApiQueryBuilder";
 
 type ProductApiOptions = ApiOptions & {
-  category?: string[];
+  categories?: string[];
   priceRange?: string;
 }
 
 class ProductQueryBuilder extends ApiQueryBuilder<ProductApiOptions> {
   protected appendCustom(): void {
-    const { status, category, priceRange } = this.options;
+    const { status, categories, priceRange } = this.options;
 
     if (status && status !== "all") {
       this.params.set("status", status.toString());
     }
 
-    if (category && category.length > 0) {
-      this.params.set("category", category[0]);
+    if (categories && categories.length > 0) {
+      this.params.set("categories", categories.join(","));
     }
 
     if (priceRange && priceRange !== "") {
@@ -54,7 +54,7 @@ export function useProducts(options: ApiOptions = {}) {
   };
 
   const query = useMemo(() => {
-    return new ProductQueryBuilder(options).build(); 
+    return new ProductQueryBuilder(options).build();
   }, [options]);
 
   useEffect(() => {

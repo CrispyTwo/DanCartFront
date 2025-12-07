@@ -1,7 +1,7 @@
 "use client"
 
 import { Product } from "@/src/lib/models/Product"
-import ProductCard from "../ui/product-card"
+import ProductCard from "./product/product-card"
 
 interface ProductsGridProps {
   loading: boolean;

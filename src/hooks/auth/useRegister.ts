@@ -54,8 +54,7 @@ export function useRegister(options?: UseRegisterOptions) {
       } finally {
         if (mounted.current) setIsLoading(false)
       }
-    },
-    [options, router]
+    }, [options, router]
   )
 
   return { handleRegister, isLoading, error, setError }

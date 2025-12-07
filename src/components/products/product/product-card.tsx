@@ -1,20 +1,30 @@
 "use client"
 
 import { ShoppingCart } from "lucide-react"
-import { useState } from "react"
 import Link from "next/link"
 import { Product } from "@/src/lib/models/Product"
+import { useAddToCart } from "@/src/hooks/cart/useAddToCart"
+
+import { toast } from "sonner"
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [isAdded, setIsAdded] = useState(false)
+  const { addToCart, isLoading } = useAddToCart()
 
-  const handleAddToCart = () => {
-    setIsAdded(true)
-    setTimeout(() => setIsAdded(false), 2000)
+  const handleAddToCart = async () => {
+    const success = await addToCart(product.id)
+    if (success) {
+      toast.success("Added to cart", {
+        description: `${product.name} has been added to your cart.`,
+      })
+    } else {
+      toast.error("Error", {
+        description: "Failed to add to cart. Please try again.",
+      })
+    }
   }
 
   const inStock = product.stock > 0;
@@ -45,14 +55,11 @@ export default function ProductCard({ product }: ProductCardProps) {
                 e.preventDefault()
                 handleAddToCart()
               }}
-              disabled={!inStock}
-              className={`p-2 rounded-lg transition ${
-                isAdded
-                  ? "bg-primary text-primary-foreground"
-                  : inStock
-                    ? "bg-muted text-foreground hover:bg-primary hover:text-primary-foreground"
-                    : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
-              }`}
+              disabled={!inStock || isLoading}
+              className={`p-2 rounded-lg transition ${inStock
+                ? "bg-muted text-foreground hover:bg-primary hover:text-primary-foreground"
+                : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
+                }`}
             >
               <ShoppingCart className="w-5 h-5" />
             </button>

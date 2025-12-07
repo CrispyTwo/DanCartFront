@@ -7,7 +7,7 @@ export class ApiService {
         throw new Error("No api url provided, contact support.")
       }
     }
-    
+
     this.baseUrl = baseUrl;
   }
 
@@ -17,6 +17,10 @@ export class ApiService {
 
   async post(path: string, version: number, payload: string, token: string = ""): Promise<any> {
     return await this.fetch(path, version, "POST", token, payload);
+  }
+
+  async put(path: string, version: number, payload: string, token: string = ""): Promise<any> {
+    return await this.fetch(path, version, "PUT", token, payload);
   }
 
   async delete(path: string, version: number, payload: string, token: string): Promise<any> {
@@ -34,13 +38,14 @@ export class ApiService {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
-    return await response.json();
+
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
   }
 
   private getHeaders(token: string): HeadersInit {
     if (token == "") {
-      return  { "Content-Type": "application/json" }
+      return { "Content-Type": "application/json" }
     }
 
     return {

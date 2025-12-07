@@ -20,7 +20,7 @@ export default function ProductsPage() {
     pageSize: 25,
     sortBy: filters.sortBy,
 
-    category: filters.categories,
+    categories: filters.categories,
     priceRange: filters.priceRanges[0],
     inStock: filters.inStockOnly ? "true" : undefined,
   }), [filters])

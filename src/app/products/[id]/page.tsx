@@ -1,47 +1,52 @@
 "use client"
 
+import { useState, use } from "react"
 import ProductImages from "@/src/components/products/product/images"
 import ProductInfo from "@/src/components/products/product/info"
-import { useState } from "react"
+import { useProduct } from "@/src/hooks/products/useProduct"
 
-const MOCK_PRODUCT = {
-  id: "1",
-  name: "Premium Wireless Headphones",
-  price: 299.99,
-  originalPrice: 399.99,
-  rating: 4.5,
-  reviews: 128,
-  description:
-    "Experience crystal-clear audio with our premium wireless headphones. Featuring active noise cancellation, 30-hour battery life, and premium comfort for all-day wear.",
-  features: [
-    "Active Noise Cancellation",
-    "30-hour battery life",
-    "Premium comfort design",
-    "Bluetooth 5.0 connectivity",
-    "Built-in microphone",
-    "Foldable design",
-  ],
-  images: [
-    "/placeholder.svg?key=j5xcu",
-    "/placeholder.svg?key=2aayp",
-    "/placeholder.svg?key=cr8fa",
-    "/placeholder.svg?key=9y2vs",
-  ],
-  stock: 15,
-  color: "Space Gray",
-  colors: ["Space Gray", "Silver", "Gold"],
-  inStock: true,
+interface ProductPageProps {
+  params: Promise<{
+    id: string;
+  }>;
 }
 
-export default function ProductPage({ params }: { params: { id: string } }) {
+export default function ProductPage({ params }: ProductPageProps) {
+  const { id } = use(params)
+  const { product, loading, error } = useProduct(id)
   const [quantity, setQuantity] = useState(1)
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+      </main>
+    )
+  }
+
+  if (error || !product) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-destructive mb-4">Error Loading Product</h1>
+          <p className="text-muted-foreground">{error || "Product not found"}</p>
+        </div>
+      </main>
+    )
+  }
+
+  const images = [
+    "/placeholder.svg?key=1",
+    "/placeholder.svg?key=2",
+    "/placeholder.svg?key=3"
+  ]
 
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <ProductImages images={MOCK_PRODUCT.images} />
-          <ProductInfo product={MOCK_PRODUCT} quantity={quantity} setQuantity={setQuantity} />
+          <ProductImages images={images} />
+          <ProductInfo product={product} quantity={quantity} setQuantity={setQuantity} />
         </div>
       </div>
     </main>
