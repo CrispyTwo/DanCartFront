@@ -2,10 +2,9 @@ import React, { useCallback, useState } from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu";
 import { Button } from "@/src/components/ui/button";
 import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
-import { toast } from "@/src/hooks/useToast";
-import { ApiService } from "@/src/lib/api/ApiService";
+import { ApiService } from "@/src/lib/services/ApiService";
 import { AuthenticationService } from "@/src/lib/services/AuthenticationService";
-
+import { toast } from "sonner"
 type DropdownProps = {
   id: string;
 };
@@ -20,14 +19,14 @@ const OrderDropdown: React.FC<DropdownProps> = ({ id }) => {
       if (token == null) throw new Error();
       const res = await new ApiService().delete(`/salesOrders/${id}`, 1, "", token);
       if (!res.ok) throw new Error(await res.text());
-      toast({ title: "Success", description: "Deleted successfully" });
+      toast("Deleted successfully");
     } catch (err) {
-      toast({ title: "Fail", description: "Deletion failed" });
+      toast("Deletion failed");
     } finally {
       setLoading(false);
     }
   }, [id]);
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

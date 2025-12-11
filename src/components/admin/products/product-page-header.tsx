@@ -7,7 +7,7 @@ import { Button } from "@/src/components/ui/button"
 import { Plus } from "lucide-react"
 import { AddProductForm, type ProductFormData } from "./add-product-form"
 import { AuthenticationService } from "@/src/lib/services/AuthenticationService"
-import { ApiService } from "@/src/lib/api/ApiService"
+import { ApiService } from "@/src/lib/services/ApiService"
 import { Product } from "@/src/lib/models/Product"
 
 const ProductPageHeader: React.FC = () => {

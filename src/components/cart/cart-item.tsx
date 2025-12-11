@@ -1,45 +1,13 @@
 import { Minus, Plus, Trash2 } from "lucide-react"
-import { useState, useEffect, useCallback } from "react"
 import type { CartItem as CartItemType } from "@/src/lib/models/ShoppingCart"
 
 interface CartItemProps {
     item: CartItemType
-    onUpdateQuantity: (id: number, quantity: number) => void
-    onRemove: (id: number) => void
+    onUpdateQuantity: (id: string, quantity: number) => void
+    onRemove: (id: string) => void
 }
 
 export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemProps) {
-    const [quantity, setQuantity] = useState(item.quantity)
-
-    // Sync state with prop if it changes externally (e.g. after API refresh)
-    useEffect(() => {
-        setQuantity(item.quantity)
-    }, [item.quantity])
-
-    // Handle debounced API call
-    useEffect(() => {
-        // Only trigger if local state differs from prop (user interaction)
-        if (quantity !== item.quantity) {
-            const timer = setTimeout(() => {
-                onUpdateQuantity(item.product.id, quantity)
-            }, 500) // 500ms debounce
-
-            return () => clearTimeout(timer)
-        }
-    }, [quantity, item.quantity, item.product.id, onUpdateQuantity])
-
-    const handleIncrement = () => {
-        setQuantity(prev => prev + 1)
-    }
-
-    const handleDecrement = () => {
-        if (quantity > 1) {
-            setQuantity(prev => prev - 1)
-        } else {
-            onRemove(item.product.id)
-        }
-    }
-
     return (
         <div className="flex gap-4 p-4 bg-card border border-border rounded-lg">
             <div className="flex-shrink-0 w-24 h-24 bg-muted rounded-md overflow-hidden">
@@ -59,15 +27,15 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemP
                     <div className="text-left">
                         <div className="flex items-center gap-2 mb-2 justify-end">
                             <button
-                                onClick={handleDecrement}
+                                onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)}
                                 className="p-1 rounded hover:bg-muted transition"
                                 aria-label="Decrease quantity"
                             >
                                 <Minus className="w-4 h-4" />
                             </button>
-                            <span className="w-8 text-center font-semibold text-foreground">{quantity}</span>
+                            <span className="w-8 text-center font-semibold text-foreground">{item.quantity}</span>
                             <button
-                                onClick={handleIncrement}
+                                onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)}
                                 className="p-1 rounded hover:bg-muted transition"
                                 aria-label="Increase quantity"
                             >
@@ -75,7 +43,7 @@ export default function CartItem({ item, onUpdateQuantity, onRemove }: CartItemP
                             </button>
                         </div>
                         <p className="text-sm text-muted-foreground font-medium">
-                            Subtotal: ${(item.product.price * quantity).toFixed(2)}
+                            Subtotal: ${(item.product.price * item.quantity).toFixed(2)}
                         </p>
                     </div>
                 </div>

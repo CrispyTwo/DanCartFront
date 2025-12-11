@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { ApiService } from "../../lib/api/ApiService";
-import { AuthenticationService } from "../../lib/services/AuthenticationService";
+import { useApi } from "../useApi";
 
 export interface ProductMetrics {
   total: number;
@@ -10,7 +9,8 @@ export interface ProductMetrics {
 }
 
 export function useProductsMetrics() {
-  const [metrics, setMetrics] = useState<ProductMetrics>({total:0, active:0, lowStock:0, outOfStock:0});
+  const api = useApi();
+  const [metrics, setMetrics] = useState<ProductMetrics>({ total: 0, active: 0, lowStock: 0, outOfStock: 0 });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,17 +19,13 @@ export function useProductsMetrics() {
     setError(null);
 
     try {
-      const apiService = new ApiService();
-      const token = new AuthenticationService().getToken();
-      if (token == null) throw new Error();
-
       const metrics: ProductMetrics = {
-        total: await apiService.get(`/admin/metrics/products`, 1, token),
-        active: await apiService.get(`/admin/metrics/products?productStatus=0`, 1, token),
-        lowStock: await apiService.get(`/admin/metrics/products?productStatus=1`, 1, token),
-        outOfStock: await apiService.get(`/admin/metrics/products?productStatus=2`, 1, token),
+        total: await api.get(`/admin/metrics/products`, 1),
+        active: await api.get(`/admin/metrics/products?productStatus=0`, 1),
+        lowStock: await api.get(`/admin/metrics/products?productStatus=1`, 1),
+        outOfStock: await api.get(`/admin/metrics/products?productStatus=2`, 1),
       };
-      
+
       setMetrics(metrics);
     } catch (err: any) {
       setError(err?.message ?? String(err));

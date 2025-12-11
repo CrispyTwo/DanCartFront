@@ -1,12 +1,19 @@
 "use client"
 
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import ProfileForm from "@/src/components/profile/profile-form"
 import { useMe } from "@/src/hooks/users/useMe"
 
 export default function ProfilePage() {
   const router = useRouter()
   const { me, loading, error } = useMe()
+
+  useEffect(() => {
+    if (!loading && me === undefined) {
+      router.push("/auth")
+    }
+  }, [loading, me, router])
 
   if (loading) {
     return (
@@ -16,10 +23,7 @@ export default function ProfilePage() {
     )
   }
 
-  if (me === undefined) {
-    router.push("/auth")
-    return null
-  }
+  if (me === undefined) return null
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">

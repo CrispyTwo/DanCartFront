@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { AuthenticationService } from "../../lib/services/AuthenticationService";
+
 import { Product } from "../../lib/models/Product";
-import { ApiService } from "../../lib/api/ApiService";
-import { ApiOptions, ApiQueryBuilder } from "@/src/lib/api/ApiQueryBuilder";
+import { useApi } from "../useApi";
+import { ApiOptions, ApiQueryBuilder } from "../../lib/services/ApiQueryBuilder";
 
 type ProductApiOptions = ApiOptions & {
   categories?: string[];
@@ -28,6 +28,7 @@ class ProductQueryBuilder extends ApiQueryBuilder<ProductApiOptions> {
 }
 
 export function useProducts(options: ApiOptions = {}) {
+  const api = useApi();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,11 +38,7 @@ export function useProducts(options: ApiOptions = {}) {
     setError(null);
 
     try {
-      const apiService = new ApiService();
-      const token = new AuthenticationService().getToken();
-      if (token == null) throw new Error();
-
-      const products = await apiService.get(`/products${query}`, 1, token);
+      const products = await api.get(`/products${query}`, 1);
       console.log(query);
       console.log(products);
       setProducts(products);

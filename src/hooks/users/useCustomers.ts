@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { ApiService } from "../../lib/api/ApiService";
-import { AuthenticationService } from "../../lib/services/AuthenticationService";
-import { Customer } from "@/src/lib/models/User";
-import { ApiOptions, ApiQueryBuilder } from "@/src/lib/api/ApiQueryBuilder";
+import { useApi } from "../useApi";
+import { Customer } from "../../lib/models/User";
+import { ApiOptions, ApiQueryBuilder } from "../../lib/services/ApiQueryBuilder";
 
 class UserQueryBuilder extends ApiQueryBuilder<ApiOptions> {
   protected appendCustom(): void {
@@ -15,6 +14,7 @@ class UserQueryBuilder extends ApiQueryBuilder<ApiOptions> {
 }
 
 export function useCustomers(options: ApiOptions = {}) {
+  const api = useApi();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,11 +24,7 @@ export function useCustomers(options: ApiOptions = {}) {
     setError(null);
 
     try {
-      const apiService = new ApiService();
-      const token = new AuthenticationService().getToken();
-      if (token == null) throw new Error();
-      
-      const customers = await apiService.get(`/customers${query}`, 1, token);
+      const customers = await api.get(`/customers${query}`, 1);
 
       console.log(customers);
       setCustomers(customers);
@@ -41,7 +37,7 @@ export function useCustomers(options: ApiOptions = {}) {
   };
 
   const query = useMemo(() => {
-    return new UserQueryBuilder(options).build(); 
+    return new UserQueryBuilder(options).build();
   }, [options]);
 
   useEffect(() => {

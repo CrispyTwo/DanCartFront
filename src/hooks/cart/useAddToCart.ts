@@ -1,31 +1,31 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthenticationService } from "@/src/lib/services/AuthenticationService";
-import { ApiService } from "@/src/lib/api/ApiService";
+import { useCartContext } from "@/src/context/CartContext";
+import { useApi } from "../useApi";
 
 export function useAddToCart() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const router = useRouter();
+    const api = useApi();
+    const { refreshCart } = useCartContext();
 
-    const addToCart = async (productId: number, quantity?: number): Promise<boolean> => {
+    const addToCart = async (productId: string, quantity?: number): Promise<boolean> => {
         setIsLoading(true);
         setError(null);
 
         try {
-            const authService = new AuthenticationService();
-            const token = authService.getToken();
-            if (!authService.isAuthenticated() || !token) {
+            if (!api.isAuthenticated()) {
                 router.push("/auth");
                 return false;
             }
 
-            const apiService = new ApiService();
             const payload = JSON.stringify({
                 productId,
                 ...(quantity ? { quantity } : {})
             })
-            await apiService.post("/cart", 1, payload, token!);
+            await api.post("/cart", 1, payload);
+            await refreshCart();
             return true;
         } catch (err: any) {
             console.error("Failed to add to cart:", err);

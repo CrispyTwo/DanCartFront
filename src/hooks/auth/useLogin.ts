@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { LoginRequest } from "../../lib/models/Authentication"
-import { AuthenticationService } from "../../lib/services/AuthenticationService"
+import { useAuthContext } from "@/src/context/AuthContext"
 
 type UseLoginOptions = {
   redirectTo?: string
@@ -16,7 +16,7 @@ export function useLogin(options?: UseLoginOptions) {
   const [error, setError] = useState<string>("")
   const mounted = useRef(true)
 
-  const authService = new AuthenticationService()
+  const { login } = useAuthContext()
   useEffect(() => {
     mounted.current = true
     return () => {
@@ -37,7 +37,7 @@ export function useLogin(options?: UseLoginOptions) {
       }
 
       try {
-        const token = await authService.login(loginRequest)
+        const token = await login(loginRequest)
 
         options?.onSuccess?.(token)
         if (options?.redirectTo) router.push(options.redirectTo)

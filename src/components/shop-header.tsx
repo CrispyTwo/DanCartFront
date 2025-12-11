@@ -3,18 +3,12 @@
 import Link from "next/link"
 import { User, ShoppingCart } from "lucide-react"
 import { Button } from "./ui/button"
-import { useCart } from "../hooks/cart/useCart"
-import { AuthenticationService } from "../lib/services/AuthenticationService"
-import { useEffect, useState } from "react"
+import { useCartContext } from "../context/CartContext"
+import { useAuthContext } from "../context/AuthContext"
 
 export default function ShopHeader() {
-  const { itemCount } = useCart()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-
-  useEffect(() => {
-    const authService = new AuthenticationService()
-    setIsAuthenticated(authService.isAuthenticated())
-  }, [])
+  const { itemCount } = useCartContext()
+  const { isAuthenticated } = useAuthContext()
 
   return (
     <header className="border-b border-border bg-background sticky top-0 z-50">

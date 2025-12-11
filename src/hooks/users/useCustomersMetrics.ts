@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { ApiService } from "../../lib/api/ApiService";
-import { AuthenticationService } from "../../lib/services/AuthenticationService";
+import { useApi } from "../useApi";
 
 export interface CustomersMetrics {
   total: number;
@@ -10,7 +9,8 @@ export interface CustomersMetrics {
 }
 
 export function useCustomersMetrics() {
-  const [metrics, setMetrics] = useState<CustomersMetrics>({total: 0, active: 0, new: 0, avgOrderValue: 0});
+  const api = useApi();
+  const [metrics, setMetrics] = useState<CustomersMetrics>({ total: 0, active: 0, new: 0, avgOrderValue: 0 });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,20 +19,16 @@ export function useCustomersMetrics() {
     setError(null);
 
     try {
-      const apiService = new ApiService();
-      const token = new AuthenticationService().getToken();
-      if (token == null) throw new Error();
-
       const today = new Date();
       today.setDate(today.getDate() - 30);
-    
+
       const metrics: CustomersMetrics = {
-        total: await apiService.get(`/admin/metrics/customers`, 1, token),
-        active: await apiService.get(`/admin/metrics/customers?isActive=true`, 1, token),
-        new: await apiService.get(`/admin/metrics/customers?from=${today.toISOString()}`, 1, token),
-        avgOrderValue: await apiService.get(`/admin/metrics/orders?metric=1`, 1, token)
+        total: await api.get(`/admin/metrics/customers`, 1),
+        active: await api.get(`/admin/metrics/customers?isActive=true`, 1),
+        new: await api.get(`/admin/metrics/customers?from=${today.toISOString()}`, 1),
+        avgOrderValue: await api.get(`/admin/metrics/orders?metric=1`, 1)
       };
-      
+
       setMetrics(metrics);
     } catch (err: any) {
       setError(err?.message ?? String(err));

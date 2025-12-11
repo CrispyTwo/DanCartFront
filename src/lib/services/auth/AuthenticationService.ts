@@ -1,19 +1,17 @@
-import { JwtPayload, LoginRequest, RegisterRequest } from "../models/Authentication";
-import { ApiService } from "../api/ApiService";
+import { JwtPayload, LoginRequest, RegisterRequest } from "../../models/Authentication";
+import { ApiService } from "../ApiService";
 import { LocalStorageService } from "./LocalStorageService";
 
 export class AuthenticationService {
-  private readonly api: ApiService;
   private readonly storage: LocalStorageService;
 
   constructor(tokenKey: string = "dan_cart_jwt") {
-    this.api = new ApiService();
     this.storage = new LocalStorageService(tokenKey);
   }
 
   async login(dto: LoginRequest): Promise<string> {
     const payload = JSON.stringify(dto);
-    const res = await this.api.post("/auth/login", 1, payload);
+    const res = await new ApiService().post("/auth/login", 1, payload);
     const token = this._extractToken(res);
     this.storage.setToken(token);
     return token;
@@ -21,7 +19,7 @@ export class AuthenticationService {
 
   async register(dto: RegisterRequest): Promise<string> {
     const payload = JSON.stringify(dto);
-    const res = await this.api.post("/auth/register", 1, payload);
+    const res = await new ApiService().post("/auth/register", 1, payload);
     const token = this._extractToken(res);
     this.storage.setToken(token);
     return token;
@@ -45,7 +43,7 @@ export class AuthenticationService {
       const now = Math.floor(Date.now() / 1000);
       return payload.exp > now;
     }
-    
+
     return true;
   }
 
@@ -82,7 +80,7 @@ export class AuthenticationService {
   getRoles(): string[] {
     const payload = this.decodeJwt();
     if (!payload) return [];
-    
+
     return [payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]];
   }
 

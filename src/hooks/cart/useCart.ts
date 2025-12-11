@@ -1,65 +1,60 @@
-import { useState, useEffect, useCallback } from "react";
-import { ApiService } from "../../lib/api/ApiService";
-import { AuthenticationService } from "../../lib/services/AuthenticationService";
-import { ShoppingCart, CartItem } from "@/src/lib/models/ShoppingCart";
+import { useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useCartContext } from "../../context/CartContext";
+import { useApi } from "../useApi";
+import { useAuthContext } from "../../context/AuthContext";
+import { ShoppingCart } from "../../lib/models/ShoppingCart";
 
 export function useCart() {
-    const [itemCount, setItemCount] = useState<number>(0);
-    const [shoppingCart, setShoppingCart] = useState<ShoppingCart | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
+    const { shoppingCart, loading, setShoppingCart, refreshCart } = useCartContext();
+    const { isAuthenticated } = useAuthContext();
+    const router = useRouter();
+    const api = useApi();
 
-    const fetchCart = useCallback(async () => {
-        const authService = new AuthenticationService();
-        if (!authService.isAuthenticated()) {
-            setLoading(false);
-            return;
+    const debounceTimers = useRef<{ [key: string]: NodeJS.Timeout }>({});
+    const updateQuantity = (productId: string, newQty: number) => {
+        if (newQty < 1) return;
+        setShoppingCart((prevCart: ShoppingCart | null) => {
+            if (!prevCart) return null;
+
+            const updatedItems = prevCart.items.map((item) =>
+                item.product.id === productId ? { ...item, quantity: newQty } : item
+            );
+
+            const newTotal = updatedItems.reduce(
+                (sum, item) => sum + item.product.price * item.quantity,
+                0
+            );
+
+            return { ...prevCart, items: updatedItems, total: newTotal };
+        });
+
+        if (debounceTimers.current[productId]) {
+            clearTimeout(debounceTimers.current[productId]);
         }
+        debounceTimers.current[productId] = setTimeout(async () => {
+            try {
+                if (!isAuthenticated) {
+                    router.push("/auth");
+                    return;
+                }
 
-        try {
-            const apiService = new ApiService();
-            const token = authService.getToken();
-            if (!token) return;
-
-            const response = await apiService.get("/cart", 1, token);
-            console.log(response);
-            const items: CartItem[] = response.items;
-
-            setShoppingCart(response);
-            setItemCount(items.length);
-        } catch (err) {
-            console.error("Failed to fetch cart:", err);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        void fetchCart();
-    }, [fetchCart]);
-
-    const updateQuantity = async (productId: number, quantity: number) => {
-        try {
-            const authService = new AuthenticationService();
-            const token = authService.getToken();
-            if (!token) return;
-
-            const apiService = new ApiService();
-            await apiService.post("/cart", 1, JSON.stringify({ productId, quantity }), token);
-            await fetchCart();
-        } catch (err) {
-            console.error("Failed to update cart:", err);
-        }
+                await api.post("/cart", 1, JSON.stringify({ productId, quantity: newQty }));
+            } catch (err) {
+                console.error("Failed to sync qty, rolling back:", err);
+                void refreshCart();
+            } finally {
+                delete debounceTimers.current[productId];
+            }
+        }, 500);
     };
 
-    const removeItem = async (productId: number) => {
+    const removeItem = async (productId: string) => {
         try {
-            const authService = new AuthenticationService();
-            const token = authService.getToken();
-            if (!token) return;
+            if (!isAuthenticated) return;
 
-            const apiService = new ApiService();
-            await apiService.delete(`/cart/${productId}`, 1, "", token);
-            await fetchCart();
+            await api.delete(`/cart/${productId}`, 1, "");
+            await refreshCart();
         } catch (err) {
             console.error("Failed to remove item:", err);
         }
@@ -67,17 +62,21 @@ export function useCart() {
 
     const clearCart = async () => {
         try {
-            const authService = new AuthenticationService();
-            const token = authService.getToken();
-            if (!token) return;
+            if (!isAuthenticated) return;
 
-            const apiService = new ApiService();
-            await apiService.delete("/cart", 1, "", token);
-            await fetchCart();
+            await api.delete("/cart", 1, "");
+            await refreshCart();
         } catch (err) {
             console.error("Failed to clear cart:", err);
         }
     };
 
-    return { itemCount, shoppingCart, loading, updateQuantity, removeItem, clearCart };
+    return {
+        shoppingCart,
+        loading,
+        updateQuantity,
+        removeItem,
+        clearCart,
+        refreshCart
+    };
 }

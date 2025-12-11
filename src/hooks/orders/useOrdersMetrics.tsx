@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { ApiService } from "../../lib/api/ApiService";
-import { AuthenticationService } from "../../lib/services/AuthenticationService";
+import { useApi } from "../useApi";
 
 export interface OrdersMetrics {
   total: number;
@@ -10,7 +9,8 @@ export interface OrdersMetrics {
 }
 
 export function useOrdersMetrics() {
-  const [metrics, setMetrics] = useState<OrdersMetrics>({total:0, pending:0, inProgress:0, shipped:0});
+  const api = useApi();
+  const [metrics, setMetrics] = useState<OrdersMetrics>({ total: 0, pending: 0, inProgress: 0, shipped: 0 });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,17 +19,13 @@ export function useOrdersMetrics() {
     setError(null);
 
     try {
-      const apiService = new ApiService();
-      const token = new AuthenticationService().getToken();
-      if (token == null) throw new Error();
-
       const metrics: OrdersMetrics = {
-        total: await apiService.get(`/admin/metrics/orders?metric=0`, 1, token),
-        pending: await apiService.get(`/admin/metrics/orders?metric=0&status=0`, 1, token),
-        inProgress: await apiService.get(`/admin/metrics/orders?metric=0&status=1`, 1, token),
-        shipped: await apiService.get(`/admin/metrics/orders?metric=0&status=2`, 1, token),
+        total: await api.get(`/admin/metrics/orders?metric=0`, 1),
+        pending: await api.get(`/admin/metrics/orders?metric=0&status=0`, 1),
+        inProgress: await api.get(`/admin/metrics/orders?metric=0&status=1`, 1),
+        shipped: await api.get(`/admin/metrics/orders?metric=0&status=2`, 1),
       };
-      
+
       setMetrics(metrics);
     } catch (err: any) {
       setError(err?.message ?? String(err));

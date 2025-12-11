@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { ApiService } from "../../lib/api/ApiService";
-import { AuthenticationService } from "../../lib/services/AuthenticationService";
+import { useApi } from "../useApi";
 import { Order } from "../../lib/models/Order";
-import { ApiOptions, ApiQueryBuilder } from "@/src/lib/api/ApiQueryBuilder";
+import { ApiOptions, ApiQueryBuilder } from "@/src/lib/services/ApiQueryBuilder";
 
 export function useOrders(options: ApiOptions = {}) {
+  const api = useApi();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,11 +14,7 @@ export function useOrders(options: ApiOptions = {}) {
     setError(null);
 
     try {
-      const apiService = new ApiService();
-      const token = new AuthenticationService().getToken();
-      if (token == null) throw new Error();
-
-      const orders = await apiService.get(`/salesOrders${query}`, 1, token);
+      const orders = await api.get(`/salesOrders${query}`, 1);
 
       console.log(orders);
       setOrders(orders);
@@ -31,7 +27,7 @@ export function useOrders(options: ApiOptions = {}) {
   };
 
   const query = useMemo(() => {
-    return new ApiQueryBuilder(options).build(); 
+    return new ApiQueryBuilder(options).build();
   }, [options]);
 
   useEffect(() => {

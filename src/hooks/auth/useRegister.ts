@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { RegisterRequest } from "../../lib/models/Authentication"
-import { AuthenticationService } from "../../lib/services/AuthenticationService"
+import { useAuthContext } from "@/src/context/AuthContext"
 
 type UseRegisterOptions = {
   redirectTo?: string
@@ -16,7 +16,7 @@ export function useRegister(options?: UseRegisterOptions) {
   const [error, setError] = useState<string>("")
   const mounted = useRef(true)
 
-  const authService = new AuthenticationService()
+  const { register } = useAuthContext()
   useEffect(() => {
     mounted.current = true
     return () => {
@@ -41,7 +41,7 @@ export function useRegister(options?: UseRegisterOptions) {
       }
 
       try {
-        const token = await authService.register(registerRequest)
+        const token = await register(registerRequest)
 
         options?.onSuccess?.(token)
         if (options?.redirectTo) router.push(options.redirectTo)
