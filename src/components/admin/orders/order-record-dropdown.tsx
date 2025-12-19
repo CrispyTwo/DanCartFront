@@ -3,8 +3,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/src/components/ui/button";
 import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { ApiService } from "@/src/lib/services/ApiService";
-import { AuthenticationService } from "@/src/lib/services/AuthenticationService";
 import { toast } from "sonner"
+import { AuthenticationService } from "@/src/lib/services/auth/AuthenticationService";
 type DropdownProps = {
   id: string;
 };
@@ -17,7 +17,7 @@ const OrderDropdown: React.FC<DropdownProps> = ({ id }) => {
     try {
       const token = new AuthenticationService().getToken();
       if (token == null) throw new Error();
-      const res = await new ApiService().delete(`/salesOrders/${id}`, 1, "", token);
+      const res = await new ApiService().delete(`/salesOrders/${id}`, 1, "");
       if (!res.ok) throw new Error(await res.text());
       toast("Deleted successfully");
     } catch (err) {

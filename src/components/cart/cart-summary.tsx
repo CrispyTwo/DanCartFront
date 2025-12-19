@@ -41,9 +41,11 @@ export default function CartSummary({ cart, onClearCart }: CartSummaryProps) {
             </div>
 
             <div className="space-y-3">
-                <Button className="w-full" size="lg">
-                    Proceed to Checkout
-                </Button>
+                <Link href="/checkout" className="block w-full">
+                    <Button className="w-full" size="lg">
+                        Proceed to Checkout
+                    </Button>
+                </Link>
                 <Link href="/products" className="block">
                     <Button variant="outline" className="w-full bg-transparent">
                         Continue Shopping

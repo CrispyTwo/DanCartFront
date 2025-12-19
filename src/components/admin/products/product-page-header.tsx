@@ -6,9 +6,9 @@ import { useState } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Plus } from "lucide-react"
 import { AddProductForm, type ProductFormData } from "./add-product-form"
-import { AuthenticationService } from "@/src/lib/services/AuthenticationService"
 import { ApiService } from "@/src/lib/services/ApiService"
 import { Product } from "@/src/lib/models/Product"
+import { AuthenticationService } from "@/src/lib/services/auth/AuthenticationService"
 
 const ProductPageHeader: React.FC = () => {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false)
@@ -17,7 +17,7 @@ const ProductPageHeader: React.FC = () => {
     console.log("Adding product:", product);
     const token = new AuthenticationService().getToken();
     if (token == null) throw new Error();
-    const createdProduct = await new ApiService().post("/products", 1, JSON.stringify(product), token) as Product;
+    const createdProduct = await new ApiService().post("/products", 1, JSON.stringify(product)) as Product;
     console.log("Product created successfuly", createdProduct);
   }
 

@@ -27,7 +27,11 @@ export function useOrders(options: ApiOptions = {}) {
   };
 
   const query = useMemo(() => {
-    return new ApiQueryBuilder(options).build();
+    return new ApiQueryBuilder({
+      sortBy: "orderDate",
+      sortDir: "desc",
+      ...options,
+    }).build();
   }, [options]);
 
   useEffect(() => {

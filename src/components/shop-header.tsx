@@ -6,6 +6,15 @@ import { Button } from "./ui/button"
 import { useCartContext } from "../context/CartContext"
 import { useAuthContext } from "../context/AuthContext"
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu"
+
 export default function ShopHeader() {
   const { itemCount } = useCartContext()
   const { isAuthenticated } = useAuthContext()
@@ -28,11 +37,21 @@ export default function ShopHeader() {
               )}
             </Button>
           </Link>
-          <Link href="/profile">
-            <Button variant="ghost" size="icon" className="rounded-full" aria-label="User account">
-              <User className="h-5 w-5" />
-            </Button>
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full" aria-label="User account">
+                <User className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href="/user/profile" className="cursor-pointer w-full">Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/user/orders" className="cursor-pointer w-full">Orders</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>
