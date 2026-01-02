@@ -2,8 +2,7 @@
 
 import { Card, CardContent } from "@/src/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
-import LoginForm from "../../components/auth/login-form"
-import SignupForm from "../../components/auth/signup-form"
+import { LoginForm, SignupForm } from "@/src/features/auth"
 
 export default function AuthPage() {
   return (

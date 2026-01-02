@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, use } from "react"
-import ProductImages from "@/src/components/products/product/images"
-import ProductInfo from "@/src/components/products/product/info"
-import { useProduct } from "@/src/hooks/products/useProduct"
+import ProductImages from "@/src/app/products/[id]/_components/images"
+import ProductInfo from "@/src/app/products/[id]/_components/info"
+import { useProduct } from "@/src/features/products/hooks/useProduct"
 
 interface ProductPageProps {
   params: Promise<{
@@ -35,17 +35,12 @@ export default function ProductPage({ params }: ProductPageProps) {
     )
   }
 
-  const images = [
-    "/placeholder.svg?key=1",
-    "/placeholder.svg?key=2",
-    "/placeholder.svg?key=3"
-  ]
 
   return (
     <main className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          <ProductImages images={images} />
+          <ProductImages images={product.images} />
           <ProductInfo product={product} quantity={quantity} setQuantity={setQuantity} />
         </div>
       </div>

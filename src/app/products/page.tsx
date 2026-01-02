@@ -2,13 +2,13 @@
 
 import { useState, useMemo } from "react"
 import { ChevronDown } from "lucide-react"
-import ProductsFilterSidebar from "@/src/components/products/filter-sidebar"
-import ProductsSortDropdown from "@/src/components/products/sort-dropdown"
-import { useProducts } from "@/src/hooks/products/useProducts"
-import { ProductsHeader } from "@/src/components/products/header"
-import { ProductsErrorMessage } from "@/src/components/products/error"
-import { ProductFiltersDefault, ProductOptions } from "@/src/components/products/types"
-import { ProductsGrid } from "@/src/components/products/grid"
+import ProductsFilterSidebar from "@/src/app/products/_components/filter-sidebar"
+import ProductsSortDropdown from "@/src/app/products/_components/sort-dropdown"
+import { useProducts } from "@/src/features/products/hooks/useProducts"
+import { ProductsHeader } from "@/src/app/products/_components/header"
+import { ProductsErrorMessage } from "@/src/app/products/_components/error"
+import { ProductFiltersDefault, ProductOptions } from "@/src/app/products/_components/types"
+import { ProductsGrid } from "@/src/app/products/_components/grid"
 
 
 export default function ProductsPage() {

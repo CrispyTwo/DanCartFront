@@ -3,17 +3,10 @@
 import Link from "next/link"
 import { User, ShoppingCart } from "lucide-react"
 import { Button } from "./ui/button"
-import { useCartContext } from "../context/CartContext"
-import { useAuthContext } from "../context/AuthContext"
+import { useCartContext } from "../features/cart/context/cart-context"
+import { useAuthContext } from "../features/auth/context/auth-context"
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu"
 
 export default function ShopHeader() {
   const { itemCount } = useCartContext()

@@ -1,29 +1,27 @@
 "use client"
 
-import { useCart } from "@/src/hooks/cart/useCart"
-import CartItem from "@/src/components/cart/cart-item"
-import CartSummary from "@/src/components/cart/cart-summary"
-import EmptyCart from "@/src/components/cart/empty-cart"
-import CartLoading from "@/src/components/cart/loading"
+import CartItem from "@/src/app/cart/_components/cart-item"
+import CartSummary from "@/src/app/cart/_components/cart-summary"
+import EmptyCart from "@/src/app/cart/_components/empty-cart"
+import CartLoading from "@/src/app/cart/_components/loading"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { useAuthContext } from "@/src/context/AuthContext"
+import { useAuthContext } from "@/src/features/auth/context/auth-context"
+import useAlterCart from "./_hooks/use-alter-cart"
 
 export default function CartPage() {
-  const { shoppingCart, loading, updateQuantity, removeItem, clearCart } = useCart()
-  const { isAuthenticated } = useAuthContext()
+  const { shoppingCart, loading, updateQuantity, removeItem, clearCart } = useAlterCart()
+  const { isAuthenticated, rerouteIfNotAuthenticated } = useAuthContext()
   const router = useRouter()
 
   const items = shoppingCart?.items || []
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/auth")
-    }
+    rerouteIfNotAuthenticated();
   }, [isAuthenticated, router])
 
-  { loading && <CartLoading /> }
-  { items.length == 0 && <EmptyCart /> }
+  if (loading) { return <CartLoading /> }
+  if (items.length === 0) { return <EmptyCart /> }
 
   return (
     <div className="min-h-screen bg-background">

@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import ProfileForm from "@/src/components/user/profile/profile-form"
-import { useMe } from "@/src/hooks/users/useMe"
+import { useMe } from "@/src/features/user/hooks/useMe"
+import ProfileForm from "./_components/profile-form"
 
 export default function ProfilePage() {
   const router = useRouter()
