@@ -1,4 +1,4 @@
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
 import { ApiOptions, ApiQueryBuilder } from "@/src/lib/helpers/api-query-builder";
 import { Customer } from "@/src/types/user.types";
 import { useEffect, useMemo, useState } from "react";
@@ -14,7 +14,7 @@ class UserQueryBuilder extends ApiQueryBuilder<ApiOptions> {
 }
 
 export function useCustomers(options: ApiOptions = {}) {
-  const api = useApi();
+  const api = useProxy();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

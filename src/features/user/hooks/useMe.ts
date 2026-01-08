@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
 import { User } from "@/src/types/user.types";
 
 export function useMe() {
-  const api = useApi();
+  const api = useProxy();
   const [me, setMe] = useState<User>();
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

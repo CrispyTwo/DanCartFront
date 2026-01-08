@@ -8,7 +8,7 @@ import { Checkbox } from "@/src/components/ui/checkbox"
 import { ArrowRight } from "lucide-react"
 import PasswordInput from "./password-input"
 import AuthError from "./error"
-import useRegister from "../hooks/useRegister"
+import useRegister from "../hooks/use-register"
 
 export function SignupForm() {
   const [agreedToTerms, setAgreedToTerms] = useState(false)

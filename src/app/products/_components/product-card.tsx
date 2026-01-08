@@ -6,16 +6,19 @@ import { Product } from "@/src/types/product.types"
 import { useAddToCart } from "@/src/features/cart/hooks/use-add-to-cart"
 
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
+  const router = useRouter()
   const { addToCart, isLoading } = useAddToCart()
 
   const handleAddToCart = async () => {
-    const success = await addToCart(product.id)
+    router.push(`/products/${product.id}`);
+    /*const success = await addToCart(product.id)
     if (success) {
       toast.success("Added to cart", {
         description: `${product.name} has been added to your cart.`,
@@ -24,7 +27,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       toast.error("Error", {
         description: "Failed to add to cart. Please try again.",
       })
-    }
+    */
   }
 
   const inStock = product.stock > 0;

@@ -10,16 +10,21 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 export default function ShopHeader() {
   const { itemCount } = useCartContext()
-  const { isAuthenticated } = useAuthContext()
+  const { isAuthenticated, isAdmin, logout } = useAuthContext()
 
   return (
     <header className="border-b border-border bg-background sticky top-0 z-50">
       <div className="flex items-center justify-between px-6 py-2 max-w-7xl mx-auto">
         <Link href="/" className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity">
-          ShopHub
+          Dan Cart
         </Link>
 
         <div className="flex items-center gap-2">
+          {isAuthenticated && isAdmin && (
+            <Button variant="ghost" asChild>
+              <Link href="/admin/products">Admin Portal</Link>
+            </Button>
+          )}
           <Link href="/cart">
             <Button variant="ghost" size="icon" className="rounded-full relative" aria-label="Shopping cart">
               <ShoppingCart className="h-5 w-5" />
@@ -30,21 +35,32 @@ export default function ShopHeader() {
               )}
             </Button>
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-full" aria-label="User account">
+          {!isAuthenticated ? (
+            <Link href="/auth">
+              <Button variant="ghost" size="icon" className="rounded-full" aria-label="Sign in">
                 <User className="h-5 w-5" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link href="/user/profile" className="cursor-pointer w-full">Profile</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/user/orders" className="cursor-pointer w-full">Orders</Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            </Link>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full" aria-label="User account">
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/user/profile" className="cursor-pointer w-full">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/user/orders" className="cursor-pointer w-full">Orders</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={logout} className="cursor-pointer text-destructive focus:text-destructive">
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
     </header>

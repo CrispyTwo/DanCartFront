@@ -1,5 +1,5 @@
 
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
 import { ProductVariant } from "@/src/types/product.types";
 import { useState } from "react";
 import { useCartContext } from "../context/cart-context";
@@ -10,7 +10,7 @@ export function useCart() {
   const [error, setError] = useState<string | null>(null);
 
   const { shoppingCart, loading, refreshCart } = useCartContext();
-  const api = useApi();
+  const api = useProxy();
 
   const addToCart = async (productId: string, variant: ProductVariant, quantity?: number): Promise<boolean> => {
     setIsLoading(true);
@@ -36,7 +36,6 @@ export function useCart() {
 
   const removeItem = async (item: CartItem) => {
     try {
-      rerouteIfNotAuthenticated();
       const payload = JSON.stringify({ color: item.color, size: item.size })
       console.log(payload)
       await api.delete(`/cart/${item.product.id}`, 1, payload);
@@ -48,8 +47,6 @@ export function useCart() {
 
   const clearCart = async () => {
     try {
-      rerouteIfNotAuthenticated();
-
       await api.delete("/cart", 1, "");
       await refreshCart();
     } catch (err) {

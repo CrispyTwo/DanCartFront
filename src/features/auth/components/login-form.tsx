@@ -4,7 +4,7 @@ import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import { ArrowRight } from "lucide-react"
-import useLogin from "../hooks/useLogin"
+import useLogin from "../hooks/use-login"
 import AuthError from "./error"
 import PasswordInput from "./password-input"
 
@@ -21,11 +21,11 @@ export function LoginForm() {
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
         <PasswordInput name="password" placeholder="Enter your password" />
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <Button variant="link" className="px-0 text-sm" type="button">
             Forgot password?
           </Button>
-        </div>
+        </div> */}
       </div>
       <Button className="w-full" type="submit" disabled={isLoading}>
         {isLoading ? "Logging in..." : "Log In"}

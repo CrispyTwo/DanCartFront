@@ -11,17 +11,12 @@ export type RegisterRequest = {
   confirmPassword?: string;
 };
 
-export type AuthResponse = {
-  user: string;
-  token: string;
+export type AuthState = {
+  isAuthenticated: boolean,
+  user: {
+    id: string,
+    email: string,
+    roles: string[],
+  },
+  exp: number,
 }
-
-export type JwtPayload = {
-  sub?: string;
-  email?: string;
-  jti?: string;
-  iat?: number;
-  exp?: number;
-
-  [claim: string]: any;
-};

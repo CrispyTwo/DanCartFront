@@ -5,20 +5,22 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/src/components/ui/button"
 import { Plus } from "lucide-react"
-import { ApiService } from "@/src/lib/helpers/api-service"
 import { Product } from "@/src/types/product.types"
-import { AuthenticationService } from "@/src/lib/api/auth-service"
 import { AddProductForm, type ProductFormData } from "./add-product-form"
+import { useProxy } from "@/src/hooks/use-api"
+import { toast } from "sonner"
 
 const ProductPageHeader: React.FC = () => {
   const [isAddProductOpen, setIsAddProductOpen] = useState(false)
+  const api = useProxy();
 
   const handleAddProduct = async (product: ProductFormData) => {
-    console.log("Adding product:", product);
-    const token = new AuthenticationService().getToken();
-    if (token == null) throw new Error();
-    const createdProduct = await new ApiService().post("/products", 1, JSON.stringify(product)) as Product;
-    console.log("Product created successfuly", createdProduct);
+    const createdProduct = await api.post("/products", 1, JSON.stringify(product)) as Product;
+    if (createdProduct) {
+      toast.success("Product created successfuly");
+    } else {
+      toast.error("Failed to create product");
+    }
   }
 
   return (

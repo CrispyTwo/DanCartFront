@@ -4,58 +4,76 @@ import { AuthenticationService } from "@/src/lib/api/auth-service";
 import { LoginRequest, RegisterRequest } from "@/src/types/auth.types";
 import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { useApi } from "@/src/hooks/use-api";
 
 interface AuthContextType {
-  authService: AuthenticationService;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (dto: LoginRequest) => Promise<string>;
-  register: (dto: RegisterRequest) => Promise<string>;
+  login: (dto: LoginRequest) => Promise<void>;
+  register: (dto: RegisterRequest) => Promise<void>;
   logout: () => void;
-  rerouteIfNotAuthenticated: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const authService = useMemo(() => new AuthenticationService(), []);
+  const api = useApi()
+  const authService = useMemo(() => new AuthenticationService(api), []);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const router = useRouter()
   useEffect(() => {
-    setIsAuthenticated(authService.isAuthenticated());
-    setIsAdmin(authService.getRoles().includes("Admin"));
+    const checkSession = async () => {
+      try {
+        const authState = await authService.getState();
+
+        if (authState.isAuthenticated) {
+          setIsAuthenticated(authState.isAuthenticated);
+          setIsAdmin(authState.user.roles.includes("Admin"));
+        } else {
+          setIsAuthenticated(false);
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error("Failed to check session", error);
+        setIsAuthenticated(false);
+        setIsAdmin(false);
+      }
+    };
+
+    checkSession();
   }, [authService]);
 
   const login = async (dto: LoginRequest) => {
-    const token = await authService.login(dto);
-    setIsAuthenticated(true);
-    setIsAdmin(authService.getRoles().includes("Admin"));
-    return token;
+    try {
+      const authState = await authService.login(dto);
+      setIsAuthenticated(authState.isAuthenticated);
+      setIsAdmin(authState.user.roles.includes("Admin"));
+    } catch {
+      setIsAuthenticated(true);
+    }
   };
 
   const register = async (dto: RegisterRequest) => {
-    const token = await authService.register(dto);
-    setIsAuthenticated(true);
-    setIsAdmin(authService.getRoles().includes("Admin"));
-    return token;
+    try {
+      const authState = await authService.register(dto);
+      setIsAuthenticated(authState.isAuthenticated);
+      setIsAdmin(authState.user.roles.includes("Admin"));
+    } catch {
+      setIsAuthenticated(true);
+    }
   };
 
   const logout = () => {
     authService.logout();
     setIsAuthenticated(false);
     setIsAdmin(false);
+    router.push('/auth');
   };
 
-  const rerouteIfNotAuthenticated = () => {
-    if (!authService.isAuthenticated()) {
-      router.push('/auth');
-    }
-  }
-
   return (
-    <AuthContext.Provider value={{ authService, isAuthenticated, isAdmin, login, register, logout, rerouteIfNotAuthenticated }}>
+    <AuthContext.Provider value={{ isAuthenticated, isAdmin, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

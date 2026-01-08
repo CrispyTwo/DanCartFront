@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCartContext } from "@/src/features/cart/context/cart-context";
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
 import { ProductVariant } from "@/src/types/product.types";
 
 export function useAddToCart() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-  const api = useApi();
+  const api = useProxy();
   const { refreshCart } = useCartContext();
 
   const addToCart = async (productId: string, variant: ProductVariant, quantity?: number): Promise<boolean> => {
@@ -16,11 +16,6 @@ export function useAddToCart() {
     setError(null);
 
     try {
-      if (!api.isAuthenticated()) {
-        router.push("/auth");
-        return false;
-      }
-
       const payload = JSON.stringify({
         productId,
         variant,

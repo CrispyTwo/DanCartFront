@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { CheckoutFormData } from "@/src/features/checkout/components/checkout-form";
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
 
 type CheckoutResponse = {
   clientSecret: string
@@ -11,7 +11,7 @@ export function useCheckout(formData: CheckoutFormData) {
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null);
-  const api = useApi();
+  const api = useProxy();
 
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault()

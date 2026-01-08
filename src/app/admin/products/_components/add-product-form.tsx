@@ -11,8 +11,8 @@ import { Textarea } from "@/src/components/ui/textarea"
 
 export interface ProductFormData {
   name: string
+  category: string
   price: number
-  stock: number
   lowStockThreshold: number
   unitOfMeasure: string
   description: string
@@ -28,8 +28,8 @@ interface AddProductFormProps {
 export const AddProductForm: React.FC<AddProductFormProps> = ({ open, onOpenChange, onSubmit }) => {
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
+    category: "",
     price: 0,
-    stock: 0,
     lowStockThreshold: 0,
     unitOfMeasure: "",
     description: "",
@@ -51,8 +51,8 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ open, onOpenChan
     }
     setFormData({
       name: "",
+      category: "",
       price: 0,
-      stock: 0,
       lowStockThreshold: 0,
       unitOfMeasure: "",
       description: "",
@@ -63,7 +63,7 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ open, onOpenChan
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
           <DialogDescription>Fill in the product details below to add it to your catalog.</DialogDescription>
@@ -83,6 +83,19 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ open, onOpenChan
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="category">Category</Label>
+            <Input
+              id="category"
+              name="category"
+              type="text"
+              placeholder="Enter product category"
+              value={formData.category}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="price">Price</Label>
             <Input
               id="price"
@@ -92,20 +105,6 @@ export const AddProductForm: React.FC<AddProductFormProps> = ({ open, onOpenChan
               step="0.01"
               min="0"
               value={formData.price || ""}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="stock">Stock Quantity</Label>
-            <Input
-              id="stock"
-              name="stock"
-              type="number"
-              placeholder="0"
-              min="0"
-              value={formData.stock || ""}
               onChange={handleChange}
               required
             />

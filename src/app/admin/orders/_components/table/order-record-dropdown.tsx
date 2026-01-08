@@ -1,31 +1,39 @@
-import React, { useCallback, useState } from "react";
+import React from "react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu";
 import { Button } from "@/src/components/ui/button";
 import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
-import { ApiService } from "@/src/lib/helpers/api-service";
+import { useProxy } from "@/src/hooks/use-api";
 import { toast } from "sonner"
-import { AuthenticationService } from "@/src/lib/api/auth-service";
+import { useRouter } from "next/navigation";
 type DropdownProps = {
   id: string;
 };
 
 const OrderDropdown: React.FC<DropdownProps> = ({ id }) => {
-  const [loading, setLoading] = useState<boolean>();
-  const handleDelete = useCallback(async () => {
-    if (!confirm("Delete this item?")) return;
-    setLoading(true);
+  const api = useProxy();
+  const router = useRouter();
+
+  const handleDelete = async () => {
     try {
-      const token = new AuthenticationService().getToken();
-      if (token == null) throw new Error();
-      const res = await new ApiService().delete(`/salesOrders/${id}`, 1, "");
-      if (!res.ok) throw new Error(await res.text());
-      toast("Deleted successfully");
-    } catch (err) {
-      toast("Deletion failed");
-    } finally {
-      setLoading(false);
+      await api.delete(`/salesOrders/${id}`, 1, "");
+      toast.success("Order deleted successfully");
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to delete order:", error);
+      toast.error("Failed to delete order");
     }
-  }, [id]);
+  };
+
+  const handleUpdateStatus = async () => {
+    try {
+      await api.post(`/salesOrders/${id}/status`, 1, JSON.stringify(1));
+      toast.success("Order status updated successfully");
+      router.refresh();
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+      toast.error("Failed to update order status");
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -35,11 +43,7 @@ const OrderDropdown: React.FC<DropdownProps> = ({ id }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem>
-          <Eye className="mr-2 h-4 w-4" />
-          View
-        </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleUpdateStatus}>
           <Edit className="mr-2 h-4 w-4" />
           Update Status
         </DropdownMenuItem>

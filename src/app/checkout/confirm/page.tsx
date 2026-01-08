@@ -3,12 +3,12 @@
 import { useSearchParams } from "next/navigation"
 import { useEffect, useState } from "react"
 import { PaymentSuccess, PaymentFailure } from "@/src/features/checkout"
-import { useApi } from "@/src/hooks/useApi"
+import { useProxy } from "@/src/hooks/use-api"
 
 export default function CheckoutConfirmPage() {
   const searchParams = useSearchParams()
 
-  const api = useApi()
+  const api = useProxy()
   const redirectStatus = searchParams.get("redirect_status")
   const paymentIntent = searchParams.get("payment_intent")
   const [isLoading, setIsLoading] = useState(true)

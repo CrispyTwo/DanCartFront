@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
 import { User } from "@/src/types/user.types";
 
 export function useUpdateMe() {
-    const api = useApi();
+    const api = useProxy();
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -12,12 +12,7 @@ export function useUpdateMe() {
         setError(null);
 
         try {
-            if (!api.isAuthenticated()) {
-                throw new Error("Authentication required");
-            }
-
-            const updatedUser = await api.put(`/auth/me`, 1, JSON.stringify(user)) as User;
-            return updatedUser;
+            return await api.put(`/auth/me`, 1, JSON.stringify(user));
         } catch (err: any) {
             const errorMessage = err?.message ?? String(err);
             setError(errorMessage);

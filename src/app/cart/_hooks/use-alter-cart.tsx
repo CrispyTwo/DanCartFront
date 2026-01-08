@@ -1,18 +1,45 @@
 import { useCartContext } from "@/src/features/cart/context/cart-context";
 import { useCart } from "@/src/features/cart/hooks/use-cart";
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
 import { CartItem, ShoppingCart } from "@/src/types/cart.types";
-import { useRef } from "react";
+import { useState, useEffect } from "react";
+import { useDebounce } from "@/src/hooks/use-debounce";
 
 export default function useAlterCart() {
   const { shoppingCart, loading, setShoppingCart, refreshCart } = useCartContext();
   const { removeItem, clearCart } = useCart();
-  const api = useApi();
+  const api = useProxy();
 
-  const debounceTimers = useRef<{ [key: string]: NodeJS.Timeout }>({});
+  const [pendingUpdates, setPendingUpdates] = useState<{ [key: string]: { item: CartItem, qty: number } }>({});
+  const debouncedUpdates = useDebounce(pendingUpdates, 500);
+
+  useEffect(() => {
+    const syncUpdates = async () => {
+      const updates = Object.values(debouncedUpdates);
+      if (updates.length === 0) return;
+
+      const promises = updates.map(async ({ item, qty }) => {
+        try {
+          await api.post("/cart", 1, JSON.stringify({
+            productId: item.product.id,
+            quantity: qty,
+            variant: { color: item.color, size: item.size }
+          }));
+        } catch (err) {
+          console.error("Failed to sync qty:", err);
+        }
+      });
+
+      await Promise.all(promises);
+      setPendingUpdates({});
+    };
+
+    void syncUpdates();
+  }, [debouncedUpdates, api]);
 
   const updateQuantity = (targetItem: CartItem, newQty: number) => {
     if (newQty < 1) return;
+
     setShoppingCart((prevCart: ShoppingCart | null) => {
       if (!prevCart) return null;
 
@@ -33,20 +60,10 @@ export default function useAlterCart() {
     });
 
     const key = `${targetItem.product.id}-${targetItem.color}-${targetItem.size}`;
-
-    if (debounceTimers.current[key]) {
-      clearTimeout(debounceTimers.current[key]);
-    }
-    debounceTimers.current[key] = setTimeout(async () => {
-      try {
-        await api.post("/cart", 1, JSON.stringify({ productId: targetItem.product.id, quantity: newQty, variant: { color: targetItem.color, size: targetItem.size } }));
-      } catch (err) {
-        console.error("Failed to sync qty, rolling back:", err);
-        void refreshCart();
-      } finally {
-        delete debounceTimers.current[key];
-      }
-    }, 500);
+    setPendingUpdates(prev => ({
+      ...prev,
+      [key]: { item: targetItem, qty: newQty }
+    }));
   };
 
   return { shoppingCart, loading, updateQuantity, removeItem, clearCart }

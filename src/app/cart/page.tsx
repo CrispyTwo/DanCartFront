@@ -4,21 +4,11 @@ import CartItem from "@/src/app/cart/_components/cart-item"
 import CartSummary from "@/src/app/cart/_components/cart-summary"
 import EmptyCart from "@/src/app/cart/_components/empty-cart"
 import CartLoading from "@/src/app/cart/_components/loading"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import { useAuthContext } from "@/src/features/auth/context/auth-context"
 import useAlterCart from "./_hooks/use-alter-cart"
 
 export default function CartPage() {
   const { shoppingCart, loading, updateQuantity, removeItem, clearCart } = useAlterCart()
-  const { isAuthenticated, rerouteIfNotAuthenticated } = useAuthContext()
-  const router = useRouter()
-
   const items = shoppingCart?.items || []
-
-  useEffect(() => {
-    rerouteIfNotAuthenticated();
-  }, [isAuthenticated, router])
 
   if (loading) { return <CartLoading /> }
   if (items.length === 0) { return <EmptyCart /> }

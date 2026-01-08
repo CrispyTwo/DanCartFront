@@ -15,7 +15,7 @@ export default function ProductsFilterSidebar({ filters, onChange }: FilterSideb
   }
 
   const config = {
-    categories: ["Food", "Pants", "Jackets"],
+    categories: ["Accessories", "Hoodie", "T-Shirt", "Boots", "Jacket", "Shorts", "Pants"],
     priceRanges: [
       { label: "Under $50", min: 0, max: 50 },
       { label: "$50+", min: 50, max: 100 }
@@ -28,14 +28,14 @@ export default function ProductsFilterSidebar({ filters, onChange }: FilterSideb
         title="Categories"
         options={config.categories.map(c => ({ label: c, value: c }))}
         selectedValues={filters.categories}
-        onChange={(newVal) => update("categories", newVal)}
+        onChange={(newVal) => update("categories", newVal.length > 0 ? [newVal[newVal.length - 1]] : [])}
       />
 
       <FilterGroup
         title="Price Range"
         options={config.priceRanges.map(r => ({ label: r.label, value: `${r.min}-${r.max}` }))}
         selectedValues={filters.priceRanges}
-        onChange={(newVal) => update("priceRanges", newVal)}
+        onChange={(newVal) => update("priceRanges", newVal.length > 0 ? [newVal[newVal.length - 1]] : [])}
       />
 
       <div className="pt-2">

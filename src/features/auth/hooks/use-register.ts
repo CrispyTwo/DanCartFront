@@ -14,15 +14,8 @@ export function useRegister(options?: UseRegisterOptions) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>("")
-  const mounted = useRef(true)
 
   const { register } = useAuthContext()
-  useEffect(() => {
-    mounted.current = true
-    return () => {
-      mounted.current = false
-    }
-  }, [])
 
   const handleRegister = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -41,23 +34,20 @@ export function useRegister(options?: UseRegisterOptions) {
       }
 
       try {
-        const token = await register(registerRequest)
-
-        options?.onSuccess?.(token)
-        if (options?.redirectTo) router.push(options.redirectTo)
-
-        return token
+        await register(registerRequest)
+        if (options?.redirectTo) router.push(options.redirectTo);
+        else router.push("/")
       } catch (err: any) {
         const message = err?.message || err?.response?.message || "Network error. Please try again."
-        if (mounted.current) setError(message)
+        setError(message)
         throw err
       } finally {
-        if (mounted.current) setIsLoading(false)
+        setIsLoading(false)
       }
     }, [options, router]
   )
 
-  return { handleRegister, isLoading, error, setError }
+  return { handleRegister, isLoading, error }
 }
 
 export default useRegister

@@ -3,11 +3,15 @@ export type ProductOptions = {
   priceRanges: string[]
   inStockOnly: boolean
   sortBy: string
+  search: string
+  aiSearch: boolean
 }
 
 export const ProductFiltersDefault: ProductOptions = {
   categories: [],
   priceRanges: [],
   inStockOnly: false,
-  sortBy: ""
+  sortBy: "",
+  search: "",
+  aiSearch: false
 }

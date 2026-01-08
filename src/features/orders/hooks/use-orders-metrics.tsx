@@ -1,4 +1,4 @@
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
 import { useEffect, useState } from "react";
 
 export interface OrdersMetrics {
@@ -9,7 +9,7 @@ export interface OrdersMetrics {
 }
 
 export function useOrdersMetrics() {
-  const api = useApi();
+  const api = useProxy();
   const [metrics, setMetrics] = useState<OrdersMetrics>({ total: 0, pending: 0, inProgress: 0, shipped: 0 });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

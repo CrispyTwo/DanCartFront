@@ -1,94 +1,31 @@
-import { JwtPayload, LoginRequest, RegisterRequest } from "@/src/types/auth.types";
+import { AuthState, LoginRequest, RegisterRequest } from "@/src/types/auth.types";
 import { ApiService } from "../helpers/api-service";
-import { LocalStorageService } from "../helpers/local-storage-service";
 
 export class AuthenticationService {
-  private readonly storage: LocalStorageService;
+  private readonly apiService: ApiService;
 
-  constructor(tokenKey: string = "dan_cart_jwt") {
-    this.storage = new LocalStorageService(tokenKey);
+  constructor(apiService: ApiService) {
+    this.apiService = apiService;
   }
 
-  async login(dto: LoginRequest): Promise<string> {
+  async login(dto: LoginRequest): Promise<AuthState> {
     const payload = JSON.stringify(dto);
-    const res = await new ApiService().post("/auth/login", 1, payload);
-    const token = this._extractToken(res);
-    this.storage.setToken(token);
-    return token;
+    await this.apiService.post("/auth/login", payload);
+    return this.getState();
   }
 
-  async register(dto: RegisterRequest): Promise<string> {
+  async register(dto: RegisterRequest): Promise<AuthState> {
     const payload = JSON.stringify(dto);
-    const res = await new ApiService().post("/auth/register", 1, payload);
-    const token = this._extractToken(res);
-    this.storage.setToken(token);
-    return token;
+    await this.apiService.post("/auth/register", payload);
+    return this.getState();
   }
 
-  logout(): void {
-    this.storage.removeToken();
+  async logout() {
+    await this.apiService.post("/auth/logout", "");
+    return this.getState();
   }
 
-  getToken(): string | null {
-    return this.storage.getToken();
-  }
-
-  isAuthenticated(): boolean {
-    const token = this.getToken();
-    if (!token) return false;
-    const payload = this.decodeJwt(token);
-    if (!payload) return true;
-
-    if (payload.exp && typeof payload.exp === "number") {
-      const now = Math.floor(Date.now() / 1000);
-      return payload.exp > now;
-    }
-
-    return true;
-  }
-
-  getUserId(): string | undefined {
-    return this.decodeJwt()?.sub;
-  }
-
-  getEmail(): string | undefined {
-    return this.decodeJwt()?.email;
-  }
-
-  decodeJwt(token: string | null = null): JwtPayload | null {
-    token = token ?? this.getToken();
-    if (!token) return null;
-
-    try {
-      const payloadPart = token.split(".")[1];
-      if (!payloadPart) return null;
-
-      const base64 = payloadPart.replace(/-/g, "+").replace(/_/g, "/");
-      const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
-
-      const json =
-        typeof atob === "function"
-          ? atob(padded)
-          : Buffer.from(padded, "base64").toString("utf8");
-
-      return JSON.parse(json) as JwtPayload;
-    } catch {
-      return null;
-    }
-  }
-
-  getRoles(): string[] {
-    const payload = this.decodeJwt();
-    if (!payload) return [];
-
-    return [payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]];
-  }
-
-  private _extractToken(res: any): string {
-    if (!res) throw new Error("Empty response from auth endpoint");
-
-    if (typeof res === "string") return res;
-    if (typeof res === "object" && typeof res.token === "string") return res.token;
-    throw new Error("Unable to parse token from response");
+  async getState(): Promise<AuthState> {
+    return await this.apiService.get("/auth/session") as AuthState;
   }
 }

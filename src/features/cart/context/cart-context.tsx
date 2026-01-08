@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { ShoppingCart } from "@/src/types/cart.types";
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
+import { useAuthContext } from "../../auth/context/auth-context";
 
 interface CartContextType {
   itemCount: number;
@@ -15,11 +16,13 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const api = useApi();
+  const api = useProxy();
 
   const [shoppingCart, setShoppingCart] = useState<ShoppingCart | null>(null);
   const [itemCount, setItemCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const { isAuthenticated } = useAuthContext();
 
   const fetchCart = useCallback(async () => {
     try {
@@ -36,7 +39,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     void fetchCart();
-  }, [fetchCart]);
+  }, [fetchCart, isAuthenticated]);
 
   return (
     <CartContext.Provider value={{

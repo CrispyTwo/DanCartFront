@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuthContext } from "@/src/features/auth/context/auth-context"
 import { LoginRequest } from "@/src/types/auth.types"
@@ -14,15 +14,8 @@ export function useLogin(options?: UseLoginOptions) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string>("")
-  const mounted = useRef(true)
 
   const { login } = useAuthContext()
-  useEffect(() => {
-    mounted.current = true
-    return () => {
-      mounted.current = false
-    }
-  }, [])
 
   const handleLogin = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -37,23 +30,20 @@ export function useLogin(options?: UseLoginOptions) {
       }
 
       try {
-        const token = await login(loginRequest)
-
-        options?.onSuccess?.(token)
-        if (options?.redirectTo) router.push(options.redirectTo)
-
-        return token
+        await login(loginRequest);
+        if (options?.redirectTo) router.push(options.redirectTo);
+        else router.push("/");
       } catch (err: any) {
         const message = err?.message || err?.response?.message || "Network error. Please try again."
-        if (mounted.current) setError(message)
+        setError(message)
         throw err
       } finally {
-        if (mounted.current) setIsLoading(false)
+        setIsLoading(false)
       }
     }, [options, router]
   )
 
-  return { handleLogin, isLoading, error, setError }
+  return { handleLogin, isLoading, error }
 }
 
 export default useLogin

@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { useApi } from "@/src/hooks/useApi";
+import { useProxy } from "@/src/hooks/use-api";
 import { ApiOptions, ApiQueryBuilder } from "@/src/lib/helpers/api-query-builder";
 import { Order } from "@/src/types/order.types";
 
 export function useOrders(options: ApiOptions = {}) {
-  const api = useApi();
+  const api = useProxy();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

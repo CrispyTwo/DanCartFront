@@ -27,7 +27,7 @@ export default function ProductsTable({ products }: { products: Product[] }) {
             <TableCell>${product.price}</TableCell>
             <TableCell>{product.stock}</TableCell>
             <TableCell><ProductStatusBadge stock={product.stock} lowStockThreshold={product.lowStockThreshold} /></TableCell>
-            <TableCell><ProductDropdown /></TableCell>
+            <TableCell><ProductDropdown id={product.id} /></TableCell>
           </TableRow>
         ))}
       </TableBody>

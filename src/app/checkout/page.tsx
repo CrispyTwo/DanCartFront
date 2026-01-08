@@ -1,5 +1,3 @@
-"use client"
-
 import { CheckoutForm } from "@/src/features/checkout"
 
 export default function CheckoutPage() {
