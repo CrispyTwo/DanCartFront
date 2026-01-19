@@ -1,11 +1,11 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { PaymentSuccess, PaymentFailure } from "@/src/features/checkout"
 import { useProxy } from "@/src/hooks/use-api"
 
-export default function CheckoutConfirmPage() {
+function CheckoutConfirmContent() {
   const searchParams = useSearchParams()
 
   const api = useProxy()
@@ -53,5 +53,18 @@ export default function CheckoutConfirmPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function CheckoutConfirmPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
+        <div className="w-16 h-16 border-4 border-gray-200 border-t-black rounded-full animate-spin mb-4"></div>
+        <h1 className="text-xl text-gray-600">Loading checkout details...</h1>
+      </div>
+    }>
+      <CheckoutConfirmContent />
+    </Suspense>
   )
 }
